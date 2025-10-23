@@ -20,11 +20,13 @@ async function bootstrap() {
 
   // Configuração do Swagger
   const config = new DocumentBuilder()
-    .setTitle('Gateway Pix API')
-    .setDescription('API simplificada para gateway de pagamentos Pix')
+    .setTitle('Gateway de Pagamentos API')
+    .setDescription(
+      'API completa para gateway de pagamentos com suporte a PIX, Cartão de Crédito e Boleto',
+    )
     .setVersion('1.0')
     .addTag('auth', 'Autenticação e autorização')
-    .addTag('charges', 'Operações relacionadas a cobranças Pix')
+    .addTag('charges', 'Operações relacionadas a cobranças de pagamento')
     .addTag('notifications', 'Operações relacionadas a notificações')
     .addTag('health', 'Verificação de saúde dos serviços')
     .addBearerAuth(

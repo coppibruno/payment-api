@@ -1,4 +1,4 @@
-# 📋 Instruções de Uso - Gateway Pix
+# 📋 Instruções de Uso - Gateway de Pagamentos
 
 ## 🚀 Início Rápido
 
@@ -7,7 +7,7 @@
 ```bash
 # Clone o repositório
 git clone <url-do-repositorio>
-cd pix-payment
+cd payment-api
 
 # Execute o script de setup automático
 ./scripts/setup.sh
@@ -29,7 +29,7 @@ docker-compose -f docker-compose.dev.yml up -d
 sleep 15
 
 # Inicialize o banco de dados
-docker exec -i pix_payment_postgres_dev psql -U postgres -d pix_payment < scripts/init-database.sql
+docker exec -i payment_gateway_postgres_dev psql -U postgres -d payment_gateway < scripts/init-database.sql
 
 # Execute a aplicação
 npm run start:dev
@@ -37,7 +37,7 @@ npm run start:dev
 
 ## 🧪 Testando a API
 
-### 1. Criar uma Cobrança
+### 1. Criar uma Cobrança (PIX)
 
 ```bash
 curl -X POST http://localhost:3000/charges \
@@ -46,7 +46,42 @@ curl -X POST http://localhost:3000/charges \
     "payer_name": "João Silva",
     "payer_document": "12345678901",
     "amount": 10000,
-    "description": "Pagamento de serviços"
+    "description": "Pagamento de serviços",
+    "payment_method": "pix"
+  }'
+```
+
+### 1.1 Criar uma Cobrança (Cartão de Crédito)
+
+```bash
+curl -X POST http://localhost:3000/charges \
+  -H "Content-Type: application/json" \
+  -d '{
+    "payer_name": "João Silva",
+    "payer_document": "12345678901",
+    "amount": 10000,
+    "description": "Pagamento de serviços",
+    "payment_method": "credit_card",
+    "card_number": "4111111111111111",
+    "card_expiry": "12/25",
+    "card_cvv": "123",
+    "card_holder_name": "João Silva",
+    "installments": 1
+  }'
+```
+
+### 1.2 Criar uma Cobrança (Boleto)
+
+```bash
+curl -X POST http://localhost:3000/charges \
+  -H "Content-Type: application/json" \
+  -d '{
+    "payer_name": "João Silva",
+    "payer_document": "12345678901",
+    "amount": 10000,
+    "description": "Pagamento de serviços",
+    "payment_method": "bank_slip",
+    "due_date": "2024-01-15T10:00:00.000Z"
   }'
 ```
 
@@ -87,19 +122,19 @@ curl http://localhost:3000/health
 
 ```bash
 # Ver logs da aplicação
-docker logs pix_payment_app
+docker logs payment_gateway_app
 
 # Ver logs do PostgreSQL
-docker logs pix_payment_postgres_dev
+docker logs payment_gateway_postgres_dev
 
 # Ver logs do MongoDB
-docker logs pix_payment_mongodb_dev
+docker logs payment_gateway_mongodb_dev
 
 # Ver logs do Redis
-docker logs pix_payment_redis_dev
+docker logs payment_gateway_redis_dev
 
 # Ver logs do RabbitMQ
-docker logs pix_payment_rabbitmq_dev
+docker logs payment_gateway_rabbitmq_dev
 ```
 
 ## 🧪 Executando Testes
@@ -188,6 +223,7 @@ docker-compose logs -f
    - Aguarde alguns segundos para os serviços ficarem prontos
 
 2. **Erro de permissão no script setup.sh**
+
    ```bash
    chmod +x scripts/setup.sh
    ```
@@ -238,7 +274,7 @@ npm cache clean --force
 NODE_ENV=production
 DATABASE_HOST=your-db-host
 DATABASE_PASSWORD=your-secure-password
-MONGODB_URI=mongodb://your-mongo-host:27017/pix_payment_logs
+MONGODB_URI=mongodb://your-mongo-host:27017/payment_gateway_logs
 REDIS_HOST=your-redis-host
 RABBITMQ_URL=amqp://your-rabbitmq-host:5672
 JWT_SECRET=your-very-secure-secret

@@ -66,7 +66,7 @@ describe('RabbitMQService', () => {
         'amqp://admin:admin@localhost:5672',
       );
       expect(mockConnection.createChannel).toHaveBeenCalled();
-      expect(mockChannel.assertQueue).toHaveBeenCalledWith('pix_payments', {
+      expect(mockChannel.assertQueue).toHaveBeenCalledWith('payment_payments', {
         durable: true,
       });
     });
@@ -106,7 +106,7 @@ describe('RabbitMQService', () => {
       await service.sendPaymentNotification(chargeId);
 
       expect(mockChannel.sendToQueue).toHaveBeenCalledWith(
-        'pix_payments',
+        'payment_payments',
         expect.any(Buffer),
         {
           persistent: true,
@@ -260,7 +260,7 @@ describe('RabbitMQService', () => {
 
       await service.onModuleInit();
 
-      expect(mockChannel.assertQueue).toHaveBeenCalledWith('pix_payments', {
+      expect(mockChannel.assertQueue).toHaveBeenCalledWith('payment_payments', {
         durable: true,
       });
     });
@@ -279,7 +279,7 @@ describe('RabbitMQService', () => {
       await service.sendPaymentNotification(chargeId);
 
       expect(mockChannel.sendToQueue).toHaveBeenCalledWith(
-        'pix_payments',
+        'payment_payments',
         expect.any(Buffer),
         {
           persistent: true,

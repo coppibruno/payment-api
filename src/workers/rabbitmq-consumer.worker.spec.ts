@@ -93,11 +93,11 @@ describe('RabbitMQConsumerWorker', () => {
         'amqp://admin:admin@localhost:5672',
       );
       expect(mockConnection.createChannel).toHaveBeenCalled();
-      expect(mockChannel.assertQueue).toHaveBeenCalledWith('pix_payments', {
+      expect(mockChannel.assertQueue).toHaveBeenCalledWith('payment_payments', {
         durable: true,
       });
       expect(mockChannel.assertQueue).toHaveBeenCalledWith(
-        'pix_payments_failed',
+        'payment_payments_failed',
         {
           durable: true,
         },
@@ -270,11 +270,11 @@ describe('RabbitMQConsumerWorker', () => {
 
       await (worker as any).setupQueues();
 
-      expect(mockChannel.assertQueue).toHaveBeenCalledWith('pix_payments', {
+      expect(mockChannel.assertQueue).toHaveBeenCalledWith('payment_payments', {
         durable: true,
       });
       expect(mockChannel.assertQueue).toHaveBeenCalledWith(
-        'pix_payments_failed',
+        'payment_payments_failed',
         {
           durable: true,
         },
@@ -320,7 +320,7 @@ describe('RabbitMQConsumerWorker', () => {
       await (worker as any).sendToFailedQueue(mockOriginalMessage);
 
       expect(mockChannel.sendToQueue).toHaveBeenCalledWith(
-        'pix_payments_failed',
+        'payment_payments_failed',
         expect.any(Buffer),
         {
           persistent: true,

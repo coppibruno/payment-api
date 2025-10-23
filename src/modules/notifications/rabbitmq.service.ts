@@ -27,8 +27,8 @@ export class RabbitMQService {
       this.connection = await amqp.connect(rabbitmqUrl);
       this.channel = await this.connection.createChannel();
 
-      // Declara a fila pix_payments
-      await this.channel.assertQueue('pix_payments', {
+      // Declara a fila payment_payments
+      await this.channel.assertQueue('payment_payments', {
         durable: true,
       });
 
@@ -52,7 +52,7 @@ export class RabbitMQService {
       };
 
       await this.channel.sendToQueue(
-        'pix_payments',
+        'payment_payments',
         Buffer.from(JSON.stringify(message)),
         {
           persistent: true,

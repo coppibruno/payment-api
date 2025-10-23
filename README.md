@@ -1,20 +1,21 @@
-# 🏦 Gateway Pix - API de Pagamentos
+# 🏦 Gateway de Pagamentos - API Multi-Métodos
 
-[![CI Pipeline](https://github.com/supero/pix-payment/actions/workflows/ci.yml/badge.svg)](https://github.com/supero/pix-payment/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/supero/pix-payment/branch/main/graph/badge.svg)](https://codecov.io/gh/supero/pix-payment)
+[![CI Pipeline](https://github.com/supero/payment-api/actions/workflows/ci.yml/badge.svg)](https://github.com/supero/payment-api/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/supero/payment-api/branch/main/graph/badge.svg)](https://codecov.io/gh/supero/payment-api)
 [![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](https://opensource.org/licenses/ISC)
 
-Uma API simplificada para gateway de pagamentos Pix desenvolvida com NestJS, PostgreSQL, Redis, MongoDB e RabbitMQ.
+Uma API completa para gateway de pagamentos que suporta PIX, Cartão de Crédito e Boleto, desenvolvida com NestJS, PostgreSQL, Redis, MongoDB e RabbitMQ.
 
 ## 🎯 Funcionalidades
 
-- ✅ **Criação de cobranças Pix** com dados do pagador
+- ✅ **Criação de cobranças** para PIX, Cartão de Crédito e Boleto
 - ✅ **Consulta de status** com cache Redis para performance
 - ✅ **Simulação de notificações** via RabbitMQ
 - ✅ **Worker automático** para processar pagamentos
 - ✅ **Logs de notificações** armazenados no MongoDB
 - ✅ **Documentação Swagger** integrada
 - ✅ **Docker Compose** para desenvolvimento
+- ✅ **Múltiplos métodos de pagamento** com validações específicas
 
 ## 🛠️ Tecnologias Utilizadas
 
@@ -38,7 +39,7 @@ Uma API simplificada para gateway de pagamentos Pix desenvolvida com NestJS, Pos
 
 ```bash
 git clone <url-do-repositorio>
-cd pix-payment
+cd payment-api
 ```
 
 ### 2. Instale as dependências
@@ -61,10 +62,10 @@ DATABASE_HOST=localhost
 DATABASE_PORT=5432
 DATABASE_USERNAME=postgres
 DATABASE_PASSWORD=postgres
-DATABASE_NAME=pix_payment
+DATABASE_NAME=payment_gateway
 
 # MongoDB
-MONGODB_URI=mongodb://localhost:27017/pix_payment_logs
+MONGODB_URI=mongodb://localhost:27017/payment_gateway_logs
 
 # Redis
 REDIS_HOST=localhost
@@ -90,7 +91,7 @@ NODE_ENV=development
 docker-compose -f docker-compose.dev.yml up -d
 
 # Inicialize o banco de dados
-docker exec -i pix_payment_postgres_dev psql -U postgres -d pix_payment < scripts/init-database.sql
+docker exec -i payment_gateway_postgres_dev psql -U postgres -d payment_gateway < scripts/init-database.sql
 
 # Instala dependências e executa a aplicação
 npm install
@@ -115,26 +116,89 @@ Após iniciar a aplicação, acesse:
 
 ### POST /charges
 
-Cria uma nova cobrança Pix.
+Cria uma nova cobrança para PIX, Cartão de Crédito ou Boleto.
 
-**Body:**
+**Body (PIX):**
 
 ```json
 {
   "payer_name": "João Silva",
   "payer_document": "12345678901",
   "amount": 10000,
-  "description": "Pagamento de serviços"
+  "description": "Pagamento de serviços",
+  "payment_method": "pix"
 }
 ```
 
-**Response:**
+**Body (Cartão de Crédito):**
+
+```json
+{
+  "payer_name": "João Silva",
+  "payer_document": "12345678901",
+  "amount": 10000,
+  "description": "Pagamento de serviços",
+  "payment_method": "credit_card",
+  "card_number": "4111111111111111",
+  "card_expiry": "12/25",
+  "card_cvv": "123",
+  "card_holder_name": "João Silva",
+  "installments": 1
+}
+```
+
+**Body (Boleto):**
+
+```json
+{
+  "payer_name": "João Silva",
+  "payer_document": "12345678901",
+  "amount": 10000,
+  "description": "Pagamento de serviços",
+  "payment_method": "bank_slip",
+  "due_date": "2024-01-15T10:00:00.000Z"
+}
+```
+
+**Response (PIX):**
 
 ```json
 {
   "charge_id": "uuid",
   "pix_key": "pix-abc123",
   "expiration_date": "2024-01-02T10:00:00.000Z",
+  "status": "pending",
+  "payer_name": "João Silva",
+  "payer_document": "12345678901",
+  "amount": 10000,
+  "description": "Pagamento de serviços",
+  "created_at": "2024-01-01T10:00:00.000Z"
+}
+```
+
+**Response (Cartão de Crédito):**
+
+```json
+{
+  "charge_id": "uuid",
+  "status": "pending",
+  "payer_name": "João Silva",
+  "payer_document": "12345678901",
+  "amount": 10000,
+  "description": "Pagamento de serviços",
+  "installments": 1,
+  "created_at": "2024-01-01T10:00:00.000Z"
+}
+```
+
+**Response (Boleto):**
+
+```json
+{
+  "charge_id": "uuid",
+  "bank_slip_code": "23791234567890123456789012345678901234567890",
+  "bank_slip_url": "https://example.com/boleto/123456",
+  "due_date": "2024-01-15T10:00:00.000Z",
   "status": "pending",
   "payer_name": "João Silva",
   "payer_document": "12345678901",
@@ -238,10 +302,10 @@ npm run start:prod
 
 ```bash
 # Build da imagem
-docker build -t pix-payment .
+docker build -t payment-gateway .
 
 # Executa o container
-docker run -p 3000:3000 pix-payment
+docker run -p 3000:3000 payment-gateway
 ```
 
 ## 📈 Performance
@@ -250,6 +314,7 @@ docker run -p 3000:3000 pix-payment
 - **Worker assíncrono**: Processamento de pagamentos em background
 - **Connection pooling**: Otimização de conexões com banco
 - **Lazy loading**: Carregamento sob demanda de módulos
+- **Múltiplos métodos**: Suporte a PIX, Cartão de Crédito e Boleto
 
 ## 🤝 Contribuição
 
@@ -284,4 +349,4 @@ Desenvolvido como teste técnico para avaliação de competências em:
 - Cache e pub-sub com Redis
 - APIs REST com NestJS
 - Boas práticas de código e segurança
-- Transações financeiras (Pix)
+- Transações financeiras (PIX, Cartão de Crédito e Boleto)

@@ -27,7 +27,7 @@ import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
         port: configService.get('DATABASE_PORT', 5432),
         username: configService.get('DATABASE_USERNAME', 'postgres'),
         password: configService.get('DATABASE_PASSWORD', 'postgres'),
-        database: configService.get('DATABASE_NAME', 'pix_payment'),
+        database: configService.get('DATABASE_NAME', 'payment_gateway'),
         entities: [Charge, Customer],
         synchronize: configService.get('NODE_ENV') === 'development',
         logging: configService.get('NODE_ENV') === 'development',
@@ -39,7 +39,7 @@ import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
       useFactory: (configService: ConfigService) => ({
         uri: configService.get(
           'MONGODB_URI',
-          'mongodb://localhost:27017/pix_payment_logs',
+          'mongodb://localhost:27017/payment_gateway_logs',
         ),
       }),
       inject: [ConfigService],

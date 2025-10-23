@@ -3,9 +3,9 @@ version: '3.8'
 services:
   postgres:
     image: postgres:15-alpine
-    container_name: pix_payment_postgres_dev
+    container_name: payment_gateway_postgres_dev
     environment:
-      POSTGRES_DB: pix_payment
+      POSTGRES_DB: payment_gateway
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
@@ -13,33 +13,33 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - pix_network
+      - payment_network
 
   mongodb:
     image: mongo:7.0
-    container_name: pix_payment_mongodb_dev
+    container_name: payment_gateway_mongodb_dev
     environment:
-      MONGO_INITDB_DATABASE: pix_payment_logs
+      MONGO_INITDB_DATABASE: payment_gateway_logs
     ports:
       - "27017:27017"
     volumes:
       - mongodb_data:/data/db
     networks:
-      - pix_network
+      - payment_network
 
   redis:
     image: redis:7-alpine
-    container_name: pix_payment_redis_dev
+    container_name: payment_gateway_redis_dev
     ports:
       - "6379:6379"
     volumes:
       - redis_data:/data
     networks:
-      - pix_network
+      - payment_network
 
   rabbitmq:
     image: rabbitmq:3-management-alpine
-    container_name: pix_payment_rabbitmq_dev
+    container_name: payment_gateway_rabbitmq_dev
     environment:
       RABBITMQ_DEFAULT_USER: admin
       RABBITMQ_DEFAULT_PASS: admin
@@ -49,7 +49,7 @@ services:
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     networks:
-      - pix_network
+      - payment_network
 
 volumes:
   postgres_data:
@@ -58,5 +58,5 @@ volumes:
   rabbitmq_data:
 
 networks:
-  pix_network:
+  payment_network:
     driver: bridge

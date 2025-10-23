@@ -45,7 +45,7 @@ export class RabbitMQConsumerWorker {
       await this.setupQueues();
 
       // Configura o consumer da fila principal
-      await this.channel.consume('pix_payments', async (msg) => {
+      await this.channel.consume('payment_payments', async (msg) => {
         if (msg) {
           try {
             await this.processPaymentNotification(msg);
@@ -64,7 +64,7 @@ export class RabbitMQConsumerWorker {
       });
 
       // Configura o consumer da DLQ para monitoramento
-      await this.channel.consume('pix_payments_failed', async (msg) => {
+      await this.channel.consume('payment_payments_failed', async (msg) => {
         if (msg) {
           await this.processFailedPayment(msg);
           this.channel.ack(msg);
@@ -174,16 +174,18 @@ export class RabbitMQConsumerWorker {
   private async setupQueues() {
     try {
       // Cria a fila principal (sem argumentos problemáticos)
-      await this.channel.assertQueue('pix_payments', {
+      await this.channel.assertQueue('payment_payments', {
         durable: true,
       });
 
       // Cria a fila de mensagens falhadas
-      await this.channel.assertQueue('pix_payments_failed', {
+      await this.channel.assertQueue('payment_payments_failed', {
         durable: true,
       });
 
-      this.logger.log('Filas configuradas: pix_payments e pix_payments_failed');
+      this.logger.log(
+        'Filas configuradas: payment_payments e payment_payments_failed',
+      );
     } catch (error) {
       this.logger.error('Erro ao configurar filas:', error);
       throw error;
@@ -202,7 +204,7 @@ export class RabbitMQConsumerWorker {
 
       // Envia para a fila de falhas
       await this.channel.sendToQueue(
-        'pix_payments_failed',
+        'payment_payments_failed',
         Buffer.from(JSON.stringify(failedMessage)),
         {
           persistent: true,

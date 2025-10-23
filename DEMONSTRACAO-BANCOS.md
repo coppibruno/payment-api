@@ -4,12 +4,14 @@
 
 Demonstrar que a aplicação consegue se comunicar com:
 
-- **PostgreSQL** (banco relacional) - para dados de cobranças
+- **PostgreSQL** (banco relacional) - para dados de cobranças de múltiplos métodos de pagamento
 - **MongoDB** (banco não-relacional) - para logs de notificações
 
 ## 🚀 Fluxo Completo
 
 ### 1. Criar Cobrança (PostgreSQL)
+
+**PIX:**
 
 ```bash
 curl -X POST http://localhost:3000/charges \
@@ -18,11 +20,46 @@ curl -X POST http://localhost:3000/charges \
     "payer_name": "João Silva",
     "payer_document": "12345678901",
     "amount": 10000,
-    "description": "Pagamento de serviços"
+    "description": "Pagamento de serviços",
+    "payment_method": "pix"
   }'
 ```
 
-**Resultado**: Cobrança salva no PostgreSQL com status `pending`
+**Cartão de Crédito:**
+
+```bash
+curl -X POST http://localhost:3000/charges \
+  -H "Content-Type: application/json" \
+  -d '{
+    "payer_name": "João Silva",
+    "payer_document": "12345678901",
+    "amount": 10000,
+    "description": "Pagamento de serviços",
+    "payment_method": "credit_card",
+    "card_number": "4111111111111111",
+    "card_expiry": "12/25",
+    "card_cvv": "123",
+    "card_holder_name": "João Silva",
+    "installments": 1
+  }'
+```
+
+**Boleto:**
+
+```bash
+curl -X POST http://localhost:3000/charges \
+  -H "Content-Type: application/json" \
+  -d '{
+    "payer_name": "João Silva",
+    "payer_document": "12345678901",
+    "amount": 10000,
+    "description": "Pagamento de serviços",
+    "payment_method": "bank_slip",
+    "due_date": "2024-01-15T10:00:00.000Z"
+  }'
+```
+
+**Resultado**: Cobrança salva no PostgreSQL com status `pending` e dados específicos do método de pagamento
 
 ### 2. Simular Pagamento (RabbitMQ)
 

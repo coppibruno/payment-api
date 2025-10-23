@@ -114,7 +114,7 @@ export class ChargesService {
   }
 
   private generatePixKey(): string {
-    // Gera uma chave Pix aleatória (formato simplificado)
+    // Gera uma chave PIX aleatória (formato simplificado)
     const randomKey = Math.random().toString(36).substring(2, 15);
     return `pix-${randomKey}`;
   }

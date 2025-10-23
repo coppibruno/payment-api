@@ -18,7 +18,7 @@ export class ChargeResponseDto {
   payment_method: PaymentMethod;
 
   @ApiProperty({
-    description: 'Chave Pix para pagamento (apenas para PIX)',
+    description: 'Chave PIX para pagamento (apenas para PIX)',
     required: false,
   })
   pix_key?: string;

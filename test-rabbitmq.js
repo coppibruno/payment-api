@@ -12,8 +12,8 @@ async function testRabbitMQ() {
     console.log('✅ Canal criado com sucesso!');
 
     // Declara a fila
-    await channel.assertQueue('pix_payments', { durable: true });
-    console.log('✅ Fila pix_payments criada/verificada!');
+    await channel.assertQueue('payment_payments', { durable: true });
+    console.log('✅ Fila payment_payments criada/verificada!');
 
     // Envia uma mensagem de teste
     const testMessage = {
@@ -23,7 +23,7 @@ async function testRabbitMQ() {
     };
 
     await channel.sendToQueue(
-      'pix_payments',
+      'payment_payments',
       Buffer.from(JSON.stringify(testMessage)),
       {
         persistent: true,

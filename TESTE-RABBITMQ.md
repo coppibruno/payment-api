@@ -1,6 +1,6 @@
 # 🐰 Guia de Teste - RabbitMQ
 
-## 🚀 Como Testar a Comunicação com RabbitMQ
+## 🚀 Como Testar a Comunicação com RabbitMQ para Gateway de Pagamentos
 
 ### 1. Iniciar os Serviços
 
@@ -28,7 +28,7 @@ npm run start:dev
 
 ### 4. Testar a API
 
-#### 4.1 Criar uma Cobrança
+#### 4.1 Criar uma Cobrança (PIX)
 
 ```bash
 curl -X POST http://localhost:3000/charges \
@@ -37,7 +37,42 @@ curl -X POST http://localhost:3000/charges \
     "payer_name": "João Silva",
     "payer_document": "12345678901",
     "amount": 10000,
-    "description": "Pagamento de serviços"
+    "description": "Pagamento de serviços",
+    "payment_method": "pix"
+  }'
+```
+
+#### 4.1.1 Criar uma Cobrança (Cartão de Crédito)
+
+```bash
+curl -X POST http://localhost:3000/charges \
+  -H "Content-Type: application/json" \
+  -d '{
+    "payer_name": "João Silva",
+    "payer_document": "12345678901",
+    "amount": 10000,
+    "description": "Pagamento de serviços",
+    "payment_method": "credit_card",
+    "card_number": "4111111111111111",
+    "card_expiry": "12/25",
+    "card_cvv": "123",
+    "card_holder_name": "João Silva",
+    "installments": 1
+  }'
+```
+
+#### 4.1.2 Criar uma Cobrança (Boleto)
+
+```bash
+curl -X POST http://localhost:3000/charges \
+  -H "Content-Type: application/json" \
+  -d '{
+    "payer_name": "João Silva",
+    "payer_document": "12345678901",
+    "amount": 10000,
+    "description": "Pagamento de serviços",
+    "payment_method": "bank_slip",
+    "due_date": "2024-01-15T10:00:00.000Z"
   }'
 ```
 
@@ -153,10 +188,10 @@ No terminal onde a aplicação está rodando, você deve ver logs como:
 docker ps | grep rabbitmq
 
 # Ver logs do RabbitMQ
-docker logs pix_payment_rabbitmq_dev
+docker logs payment_gateway_rabbitmq_dev
 
 # Reiniciar o RabbitMQ
-docker restart pix_payment_rabbitmq_dev
+docker restart payment_gateway_rabbitmq_dev
 ```
 
 #### Erro de Autenticação
@@ -185,7 +220,7 @@ Se a fila não aparecer no painel:
 
 Após seguir todos os passos, você deve ver:
 
-1. ✅ Fila `pix_payments` criada no RabbitMQ
+1. ✅ Fila `payment_payments` criada no RabbitMQ
 2. ✅ Mensagens sendo enviadas para a fila
 3. ✅ Worker processando as mensagens
 4. ✅ Status das cobranças sendo atualizado

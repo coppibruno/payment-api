@@ -1,7 +1,7 @@
 {
-  "name": "pix-payment",
+  "name": "payment-gateway",
   "version": "1.0.0",
-  "description": "Gateway Pix simplificado com NestJS, PostgreSQL, Redis, MongoDB e RabbitMQ",
+  "description": "Gateway de Pagamentos Multi-Métodos com NestJS, PostgreSQL, Redis, MongoDB e RabbitMQ",
   "author": "",
   "license": "ISC",
   "scripts": {
